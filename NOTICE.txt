@@ -1,0 +1,13 @@
+News PhotoCard Pro
+
+This Nexol BD distribution is based on News PhotoCard Pro 3.6.0.
+Original plugin author: Rasedul Haque Rumi.
+Original readme contributors: rashedulhaquerumi, synthiasoft.
+
+Modifications and current maintenance: Nexol BD.
+Website: https://nexolbd.com/
+Email: info@nexolbd.com
+Phone: +8801737963893
+
+The plugin remains licensed under GPLv2 or later.
+Bundled third-party library and font notices remain with their respective assets.

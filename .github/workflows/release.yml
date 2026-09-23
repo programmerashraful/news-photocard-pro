@@ -1,0 +1,44 @@
+name: Verify and publish plugin
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP syntax and contract tests
+        run: |
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+          php tests/license-test.php
+          php tests/updater-test.php
+          php tests/typography-test.php
+          node tests/template-test.js
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate tag and build installable ZIP
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          grep -Fx " * Version: $version" news-photocard-pro.php
+          grep -Fx "define('UDNPC_VERSION', '$version');" news-photocard-pro.php
+          grep -Fx "Stable tag: $version" readme.txt
+          git archive --format=zip --prefix=news-photocard-pro/ -o news-photocard-pro.zip HEAD
+          unzip -t news-photocard-pro.zip
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" news-photocard-pro.zip --verify-tag --title "News PhotoCard Pro $GITHUB_REF_NAME" --notes-file RELEASE-NOTES.md
