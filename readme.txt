@@ -4,7 +4,7 @@ Tags: news, elementor, social media, template, design
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.11.0
+Stable tag: 3.11.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,7 +64,7 @@ Automatic button: Enable Show automatically on posts and choose before or after 
 Shortcode: [news_photocard_button text="Download PhotoCard"]
 Elementor: Add the News PhotoCard Button widget and customize its label, icon, and styles.
 
-Shortcode and widget buttons use the current post or page, which needs a featured image. Downloads are available for public, published content without password protection.
+Shortcode and widget buttons use the current post or page, which needs a featured image. Reader downloads are available for public, published content without password protection. In the WordPress Posts list, editors can download cards for posts they can edit, including drafts, private posts, and password-protected posts. An active subscription and featured image are required.
 
 Open PhotoCard > Fonts to choose Solaiman Lipi or Shurjo. The same selector is available under Make it yours in the design editor. The preview changes immediately; save to apply the font to all designs and future downloads. Solaiman Lipi remains the default. Both fonts are bundled locally, and PNG export waits for the selected font to load.
 
@@ -104,6 +104,12 @@ GitHub privacy: https://docs.github.com/en/site-policy/privacy-policies/github-g
 The font, preview illustrations, and html2canvas are bundled locally. User-selected remote image URLs may contact their respective hosts. Generated cards are downloaded in the browser and are not uploaded to this plugin's server.
 
 == Changelog ==
+
+= 3.11.1 =
+* Added a PhotoCard download button to the WordPress Posts list, with permission, subscription, and featured-image checks.
+* Allow authorized editors to generate cards for unpublished and protected posts.
+* Corrected the Prothom Alo template canvas to 1080 x 1080 pixels.
+* Refined the admin menu icon sizing and post-list download button styling.
 
 = 3.11.0 =
 * Added a PhotoCard icon and Nexol BD creator branding.

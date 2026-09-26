@@ -1,11 +1,10 @@
-News PhotoCard Pro 3.11.0 — Nexol BD
+News PhotoCard Pro 3.11.1 — Nexol BD
 
-- New PhotoCard icon in the WordPress menu, studio, license page, and update details.
-- Creator: Nexol BD — https://nexolbd.com/.
-- Updates now come from stable releases in programmerashraful/news-photocard-pro on GitHub.
-- Monthly, yearly, and lifetime Nexol subscription activation remains required.
-- Posts, media, and saved designs are preserved when a subscription expires.
+- Download PhotoCards directly from the WordPress Posts list.
+- Authorized editors can generate cards for drafts, private posts, and password-protected posts; reader access remains limited to public, published posts without passwords.
+- Download buttons check edit permission, subscription status, and featured images.
+- Corrected the Prothom Alo canvas to 1080 x 1080 pixels.
+- Refined the admin menu icon sizing and post-list download button styling.
 
-Install `news-photocard-pro.zip` through Plugins → Add New → Upload Plugin.
-Existing GitLab-based installations must install this version once to switch to GitHub updates.
-Activate your NX-... key under PhotoCard → License.
+Install `news-photocard-pro.zip` through Plugins > Add New > Upload Plugin, or update through the WordPress Updates screen.
+An active Nexol subscription is required. Activate your NX-... key under PhotoCard > License.

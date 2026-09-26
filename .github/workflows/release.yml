@@ -20,6 +20,7 @@ jobs:
           php tests/license-test.php
           php tests/updater-test.php
           php tests/typography-test.php
+          php tests/post-list-test.php
           node tests/template-test.js
   release:
     if: startsWith(github.ref, 'refs/tags/v')

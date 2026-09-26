@@ -20,7 +20,7 @@ return [
   'css' => '
 /* Canvas */
 .npp-card {
-  position:relative;width:770px;height:1080px;background:#fff;overflow:hidden;
+  position:relative;width:1080px;height:1080px;background:#fff;overflow:hidden;
   font-family:\'SolaimanLipi\',sans-serif;color:{{opt.text_color}};border-radius:10px;
   display:flex;flex-direction:column;
 }

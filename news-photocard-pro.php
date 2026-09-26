@@ -3,7 +3,7 @@
  * Plugin Name: News PhotoCard Pro
  * Plugin URI: https://nexolbd.com/
  * Description: Create branded 1080×1080 news cards with twelve customizable designs, a live design preview, Elementor and shortcode buttons. Developed by Nexol BD.
- * Version: 3.11.0
+ * Version: 3.11.1
  * Author: Nexol BD
  * Author URI: https://nexolbd.com/
  * Update URI: https://github.com/programmerashraful/news-photocard-pro
@@ -23,7 +23,7 @@
  */
 
 if (!defined('ABSPATH')) exit;
-define('UDNPC_VERSION', '3.11.0');
+define('UDNPC_VERSION', '3.11.1');
 define('UDNPC_PLUGIN_FILE', __FILE__);
 require_once plugin_dir_path(__FILE__) . 'includes/class-photocard-license.php';
 new UDNPC_License();

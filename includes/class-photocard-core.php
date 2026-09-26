@@ -28,6 +28,8 @@ class UDNPC_Core {
     public function __construct() {
         add_action('admin_menu', [$this, 'add_menu']);
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue']);
+        add_filter('manage_post_posts_columns', [$this, 'post_columns']);
+        add_action('manage_post_posts_custom_column', [$this, 'post_column'], 10, 2);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_front_assets']);
         add_filter('the_content', [$this, 'inject_button']);
         add_shortcode('news_photocard_button', [$this, 'shortcode_button']);
@@ -143,6 +145,36 @@ class UDNPC_Core {
     }
 
     public function admin_enqueue($hook) {
+        // The sidebar appears on every admin screen, including unlicensed installs.
+        wp_add_inline_style('common', '#adminmenu .toplevel_page_news-photocard-pro .wp-menu-image img{width:20px;height:20px;object-fit:contain;padding:7px 0 0;}');
+
+        if ($hook === 'edit.php' && get_current_screen()->post_type === 'post') {
+            wp_add_inline_style('common', '
+                .column-udnpc_photocard{width:80px}
+                .column-udnpc_photocard .udnpc-wrap{display:block;margin:0;text-align:left}
+                .column-udnpc_photocard .udnpc-generate{
+                    display:inline-flex;align-items:center;justify-content:center;
+                    width:34px;height:34px;min-height:34px;padding:0;
+                    border:1px solid #ded5fa;border-radius:10px;
+                    background:linear-gradient(145deg,#faf8ff,#eee8ff);color:#6846d5;
+                    box-shadow:0 2px 4px #48318a0d;cursor:pointer;
+                    transition:background .15s,border-color .15s,color .15s,box-shadow .15s,transform .15s;
+                }
+                .column-udnpc_photocard .udnpc-generate .dashicons{font-size:18px;width:18px;height:18px}
+                .column-udnpc_photocard .udnpc-generate:hover:not(:disabled){
+                    background:#6b48e8;border-color:#6b48e8;color:#fff;
+                    box-shadow:0 4px 9px #6b48e82b;transform:translateY(-1px);
+                }
+                .column-udnpc_photocard .udnpc-generate:focus-visible{outline:2px solid #6b48e8;outline-offset:3px;box-shadow:none}
+                .column-udnpc_photocard .udnpc-generate:active:not(:disabled){background:#5937d1;transform:translateY(0);box-shadow:none}
+                .column-udnpc_photocard .udnpc-generate:disabled{background:#f6f7f7!important;border-color:#dcdcde!important;color:#a7aaad!important;box-shadow:none!important;cursor:not-allowed;transform:none}
+                .column-udnpc_photocard .udnpc-generate[aria-busy="true"]{cursor:wait}
+                .column-udnpc_photocard .udnpc-download-error{text-align:left}
+                @media(prefers-reduced-motion:reduce){.column-udnpc_photocard .udnpc-generate{transition:none;transform:none!important}}
+            ');
+            if (UDNPC_License::can_use_premium_features()) $this->enqueue_download_assets();
+        }
+
         if (strpos($hook, self::MENU_SLUG) === false) return;
         if (!UDNPC_License::can_use_premium_features()) return;
 
@@ -300,11 +332,39 @@ class UDNPC_Core {
         return sanitize_text_field($raw);
     }
 
+    public function post_columns($columns) {
+        $columns['udnpc_photocard'] = __('PhotoCard', 'news-photocard-pro');
+        return $columns;
+    }
+
+    public function post_column($column, $post_id) {
+        if ($column !== 'udnpc_photocard') return;
+        $reason = '';
+        if (!current_user_can('edit_post', $post_id)) {
+            $reason = __('You cannot edit this post.', 'news-photocard-pro');
+        } elseif (!UDNPC_License::can_use_premium_features()) {
+            $reason = __('An active subscription is required.', 'news-photocard-pro');
+        } elseif (!has_post_thumbnail($post_id)) {
+            $reason = __('Add a featured image first.', 'news-photocard-pro');
+        }
+        printf(
+            '<div class="udnpc-wrap" title="%s"><button type="button" class="button udnpc-generate" data-post-id="%d"%s aria-label="%s"><span class="dashicons dashicons-download" aria-hidden="true"></span></button></div>',
+            esc_attr($reason ?: __('Download PhotoCard', 'news-photocard-pro')),
+            (int) $post_id,
+            $reason ? ' disabled' : '',
+            esc_attr(__('Download PhotoCard', 'news-photocard-pro') . ($reason ? ': ' . $reason : ''))
+        );
+    }
+
     /* ---------- Front ---------- */
     public function enqueue_front_assets() {
         if (!is_singular()) return;
         if (!UDNPC_License::can_use_premium_features()) return;
 
+        $this->enqueue_download_assets();
+    }
+
+    private function enqueue_download_assets() {
         wp_enqueue_style('udnpc-fonts', plugin_dir_url(__FILE__) . '../assets/fonts.css', [], UDNPC_VERSION);
         wp_enqueue_style('udnpc-el-btn', plugin_dir_url(__FILE__) . '../assets/elementor-button.css', [], UDNPC_VERSION);
         wp_enqueue_script('html2canvas', plugin_dir_url(__FILE__) . '../assets/html2canvas.min.js', [], '1.4.1', true);
@@ -382,7 +442,7 @@ class UDNPC_Core {
         if (!$post_id) wp_send_json_error(['message' => 'Invalid post id']);
 
         $post = get_post($post_id);
-        if (!$post || $post->post_status !== 'publish' || !empty($post->post_password) || !is_post_type_viewable($post->post_type)) {
+        if (!$post || (!current_user_can('edit_post', $post_id) && ($post->post_status !== 'publish' || !empty($post->post_password) || !is_post_type_viewable($post->post_type)))) {
             wp_send_json_error(['message' => __('This post is not publicly available.', 'news-photocard-pro')], 403);
         }
         $title = html_entity_decode(wp_strip_all_tags(get_the_title($post_id)), ENT_QUOTES, get_bloginfo('charset'));
