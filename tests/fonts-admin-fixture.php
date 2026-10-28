@@ -10,7 +10,7 @@ foreach ([
     UDNPC_License::KEY => 'NX-RENDER-FIXTURE',
     UDNPC_License::INSTANCE => $license_instance,
     UDNPC_License::RETRY => time() + 21600,
-    UDNPC_License::STATE => array_merge($license_instance, ['active' => true, 'fingerprint' => hash('sha256', 'NX-RENDER-FIXTURE'), 'last_verified_at' => time(), 'valid_until' => time() + 21600]),
+    UDNPC_License::STATE => array_merge($license_instance, ['active' => true, 'fingerprint' => hash('sha256', 'NX-RENDER-FIXTURE'), 'last_verified_at' => time(), 'valid_until' => time() + 21600, 'expires_at' => null]),
 ] as $option => $value) {
     add_filter('pre_option_' . $option, function () use ($value) { return $value; });
 }

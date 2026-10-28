@@ -66,9 +66,25 @@ class UDNPC_License {
     }
 
     private static function valid($state) {
+        $expires = self::expiry($state);
         return self::matches($state) && ($state['active'] ?? false) === true &&
+            $expires !== false && time() < $expires &&
             time() < ($state['valid_until'] ?? 0) &&
             time() < ($state['last_verified_at'] ?? 0) + self::CACHE_SECONDS;
+    }
+
+    private static function expiry($data) {
+        if (!array_key_exists('expires_at', $data)) return false;
+        if ($data['expires_at'] === null) return PHP_INT_MAX;
+        if (!is_string($data['expires_at']) || !preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/', $data['expires_at'])) return false;
+        try {
+            $date = new DateTimeImmutable($data['expires_at']);
+            $errors = DateTimeImmutable::getLastErrors();
+            if ($errors !== false && ($errors['warning_count'] || $errors['error_count'])) return false;
+            return $date->getTimestamp();
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     public static function can_use_premium_features() {
@@ -123,22 +139,18 @@ class UDNPC_License {
                     self::cleanup();
                     return true;
                 }
-                $expires = false;
-                if (array_key_exists('expires_at', $body)) {
-                    if ($body['expires_at'] === null) $expires = PHP_INT_MAX;
-                    elseif (is_string($body['expires_at']) && preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/', $body['expires_at'])) $expires = strtotime($body['expires_at']);
-                }
+                $expires = self::expiry($body);
                 if ($action !== 'deactivate' && ($body['active'] ?? null) === true &&
                     ($body['product_code'] ?? '') === self::PRODUCT &&
                     ($body['instance_id'] ?? '') === $instance['instance_id'] &&
                     ($body['site_url'] ?? '') === $instance['site_url'] && $expires !== false && $expires > time() &&
                     isset($body['check_after_seconds']) && is_int($body['check_after_seconds']) && $body['check_after_seconds'] > 0) {
-                    $until = min(time() + self::CACHE_SECONDS, $expires);
+                    $until = min(time() + min(self::CACHE_SECONDS, $body['check_after_seconds']), $expires);
                     update_option(self::STATE, array_merge($instance, [
                         'active' => true, 'fingerprint' => hash('sha256', $key), 'last_verified_at' => time(),
                         'valid_until' => $until, 'expires_at' => $body['expires_at'], 'retry_error' => false,
                     ]), false);
-                    update_option(self::RETRY, min($until, time() + max(60, min(self::CACHE_SECONDS, $body['check_after_seconds']))), false);
+                    update_option(self::RETRY, $until, false);
                     self::schedule();
                     return true;
                 }
@@ -152,7 +164,7 @@ class UDNPC_License {
             ];
             $message = $messages[$status] ?? ($temporary ? 'The license service is temporarily unavailable. Please try again later.' : 'The license service returned an unexpected response. Contact Nexol support.');
             // Never extend entitlement after an outage. Explicit denials and malformed responses fail closed.
-            if (!$temporary || $action === 'activate') $state['active'] = false;
+            if (!$temporary) $state['active'] = false;
             $state['retry_error'] = true;
             $state['message'] = $message;
             $delay = $temporary ? 300 : self::CACHE_SECONDS;

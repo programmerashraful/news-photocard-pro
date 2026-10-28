@@ -80,6 +80,10 @@ foreach (['product_code' => 'wrong', 'instance_id' => 'wrong', 'site_url' => 'ht
     reset_fixture(); $GLOBALS['override'] = [$field => $value];
     verify(is_wp_error(activate()) && !UDNPC_License::can_use_premium_features(), 'Reject malformed response: ' . $field);
 }
+foreach (['2028-02-31T08:00:00+00:00', '2028-13-01T08:00:00+00:00'] as $invalid_date) {
+    reset_fixture(); $GLOBALS['expiry'] = $invalid_date;
+    verify(is_wp_error(activate()) && !UDNPC_License::can_use_premium_features(), 'Impossible calendar expiry is rejected: ' . $invalid_date);
+}
 reset_fixture(); $GLOBALS['expiry'] = gmdate('c', time() - 1);
 verify(is_wp_error(activate()), 'Expired activation is rejected');
 reset_fixture(); $GLOBALS['expiry'] = null; activate();
@@ -87,6 +91,16 @@ $state = get_option(UDNPC_License::STATE);
 verify($state['valid_until'] <= time() + 21600 && UDNPC_License::can_use_premium_features(), 'Lifetime entitlement still has six-hour cache limit');
 reset_fixture(); $GLOBALS['expiry'] = gmdate('c', time() + 100); activate();
 verify(get_option(UDNPC_License::STATE)['valid_until'] <= time() + 100, 'Cache cannot outlive subscription expiry');
+reset_fixture(); $GLOBALS['override'] = ['check_after_seconds' => 30]; activate();
+$state = get_option(UDNPC_License::STATE);
+verify($state['valid_until'] <= time() + 30 && get_option(UDNPC_License::RETRY) <= $state['valid_until'], 'Short server check interval caps entitlement and next verification');
+reset_fixture(); $GLOBALS['override'] = ['check_after_seconds' => 86400]; activate();
+verify(get_option(UDNPC_License::STATE)['valid_until'] <= time() + 21600, 'Long server interval cannot extend six-hour maximum');
+reset_fixture(); activate();
+$state = get_option(UDNPC_License::STATE);
+$state['expires_at'] = gmdate('c', time() - 1);
+update_option(UDNPC_License::STATE, $state, false);
+verify(!UDNPC_License::can_use_premium_features(), 'Subscription expiry is enforced independently of cached deadline');
 
 foreach ([403, 409, 422] as $status) {
     reset_fixture(); activate(); $GLOBALS['response'] = ['status' => $status, 'body' => []];
@@ -101,6 +115,9 @@ foreach ([0, 500, 429] as $status) {
     verify(count($GLOBALS['requests']) === $count, 'Backoff prevents repeated requests: ' . $status);
     $state = get_option(UDNPC_License::STATE); $state['valid_until'] = time() - 1; update_option(UDNPC_License::STATE, $state, false);
     verify(!UDNPC_License::can_use_premium_features(), 'Outage cannot extend expired cache: ' . $status);
+    reset_fixture(); activate(); $until = get_option(UDNPC_License::STATE)['valid_until'];
+    $GLOBALS['response'] = $status ? ['status' => $status, 'body' => []] : new WP_Error('network');
+    verify(is_wp_error(activate()) && UDNPC_License::can_use_premium_features() && get_option(UDNPC_License::STATE)['valid_until'] === $until, 'Activation retry during outage preserves only existing verification: ' . $status);
     reset_fixture(); $GLOBALS['response'] = new WP_Error('network');
     verify(is_wp_error(activate()) && !UDNPC_License::can_use_premium_features(), 'No offline activation');
 }

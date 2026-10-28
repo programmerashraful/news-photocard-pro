@@ -25,5 +25,6 @@ $fixture[UDNPC_License::STATE] = array_merge($identity, ['active' => true, 'fing
 ob_start(); UDNPC_License::page(); $html = ob_get_clean();
 verify(strpos($html, '>Active<') !== false && strpos($html, 'Lifetime') !== false && strpos($html, 'Deactivate and release installation') !== false, 'Active license screen renders status and controls');
 verify(strpos($html, 'NX-WORDPRESS-FIXTURE') === false, 'Saved key never appears in rendered HTML');
+verify(strpos($html, 'Verification valid until (UTC)') !== false && strpos($html, 'Get activation license') !== false, 'License page explains store activation and verification deadline');
 ob_start(); $core->settings_page(); $html = ob_get_clean();
 verify(strpos($html, 'udnpc-settings-form') !== false, 'Active license unlocks existing studio');

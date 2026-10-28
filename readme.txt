@@ -4,7 +4,7 @@ Tags: news, elementor, social media, template, design
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.11.1
+Stable tag: 3.11.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,7 +46,7 @@ PhotoCard > License provides activation, status, expiry, renewal checks, and dea
 
 Card generation, the design editor, front-end buttons, Elementor rendering, AJAX downloads, and GitHub update downloads require active entitlement. Reader downloads remain public on a licensed site. Invalid subscriptions never delete posts, media, or saved designs. A cached page may retain a button after expiry, but its download request is rejected server-side.
 
-Successful verification is valid for at most six hours, capped by subscription expiry. The hourly WP-Cron job checks when validation is due; feature access also refreshes due checks. WP-Cron depends on traffic. 403/409/422 and unexpected responses disable entitlement; network/5xx/429 errors only retain an existing, unexpired cache. Retries use bounded backoff without extending the original validity period. Refunds and revocations may take up to six hours to reach a cached client.
+Successful verification is valid for at most six hours, capped by subscription expiry and any shorter check interval returned by Nexol. Expiry is also checked independently on feature access. The hourly WP-Cron job checks when validation is due; feature access also refreshes due checks. WP-Cron depends on traffic. 403/409/422 and unexpected responses disable entitlement; network/5xx/429 errors only retain an existing, unexpired cache, including when retrying activation. Retries use bounded backoff without extending the original validity period. Refunds and revocations may take up to six hours to reach a cached client.
 
 After renewal, select Check subscription / renewal. A failed activation can be retried with Retry activation. To change keys, deactivate first. Remove local key is a recovery option for an incorrect key or unavailable server; it does not free a server activation slot.
 
@@ -104,6 +104,12 @@ GitHub privacy: https://docs.github.com/en/site-policy/privacy-policies/github-g
 The font, preview illustrations, and html2canvas are bundled locally. User-selected remote image URLs may contact their respective hosts. Generated cards are downloaded in the browser and are not uploaded to this plugin's server.
 
 == Changelog ==
+
+= 3.11.2 =
+* Honor shorter Nexol verification intervals and enforce subscription expiry independently of cached validity.
+* Preserve existing unexpired verification when activation is retried during a temporary service outage.
+* Reject impossible calendar dates in license responses.
+* Explain order-to-activation steps and show the verification deadline on the license screen.
 
 = 3.11.1 =
 * Added a PhotoCard download button to the WordPress Posts list, with permission, subscription, and featured-image checks.

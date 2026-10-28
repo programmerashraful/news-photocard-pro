@@ -7,10 +7,12 @@
         <div class="notice <?php echo is_wp_error($result) ? 'notice-error' : 'notice-success'; ?>"><p><?php echo esc_html(is_wp_error($result) ? $result->get_error_message() : __('License updated successfully.', 'news-photocard-pro')); ?></p></div>
     <?php endif; ?>
     <p><?php esc_html_e('Activate the Nexol license from your order to enable PhotoCard Pro on this website.', 'news-photocard-pro'); ?></p>
+    <p><?php esc_html_e('Purchase PhotoCard Pro at nexolbd.com, sign in to your account, and open your paid order. Select Get activation license and paste the NX-... key below. Monthly, yearly, and lifetime plans all activate here.', 'news-photocard-pro'); ?></p>
     <table class="widefat striped" style="max-width:800px"><tbody>
         <tr><th><?php esc_html_e('Status', 'news-photocard-pro'); ?></th><td><strong><?php echo esc_html($active ? __('Active', 'news-photocard-pro') : __('Inactive — activation or verification required', 'news-photocard-pro')); ?></strong></td></tr>
         <tr><th><?php esc_html_e('Subscription expiry (UTC)', 'news-photocard-pro'); ?></th><td><?php echo esc_html(array_key_exists('expires_at', $state) ? ($state['expires_at'] === null ? __('Lifetime', 'news-photocard-pro') : $state['expires_at']) : '—'); ?></td></tr>
         <tr><th><?php esc_html_e('Last verified (UTC)', 'news-photocard-pro'); ?></th><td><?php echo esc_html(!empty($state['last_verified_at']) ? gmdate('Y-m-d H:i:s', $state['last_verified_at']) : '—'); ?></td></tr>
+        <tr><th><?php esc_html_e('Verification valid until (UTC)', 'news-photocard-pro'); ?></th><td><?php echo esc_html($active && !empty($state['valid_until']) ? gmdate('Y-m-d H:i:s', $state['valid_until']) : '—'); ?></td></tr>
         <tr><th><?php esc_html_e('Registered site', 'news-photocard-pro'); ?></th><td><?php echo esc_html($instance['site_url'] ?? '—'); ?></td></tr>
     </tbody></table>
     <?php if (!empty($state['message'])): ?><p role="status"><?php echo esc_html($state['message']); ?></p><?php endif; ?>
