@@ -4,7 +4,7 @@
 
 Create branded 1080 × 1080 news cards with twelve designs, Bangla fonts, live previews, shortcode and Elementor buttons.
 
-**Created by [Nexol BD](https://nexolbd.com/) · Version 3.11.2**
+**Created by [Nexol BD](https://nexolbd.com/) · Version 3.11.3**
 
 ## Install
 
@@ -18,7 +18,7 @@ Requires WordPress 5.8+ and PHP 7.4+. An active Nexol subscription is required f
 ## Sell through Nexol BD
 
 1. Create or edit the store product with delivery type **Download + license activation**, integration product code **photocard-pro**, and the desired installations per license.
-2. Upload `dist/news-photocard-pro-3.11.2.zip` as the **private download ZIP** and choose **Add to cart** as the product action.
+2. Upload `dist/news-photocard-pro-3.11.3.zip` as the **private download ZIP** and choose **Add to cart** as the product action.
 3. Choose Monthly, Yearly, or Lifetime. Use separate listings with the same integration code for different plans.
 4. After confirming payment, mark the order paid. Customers sign in, open their order, select **Get activation license**, then enter the key under **PhotoCard → License** in WordPress.
 

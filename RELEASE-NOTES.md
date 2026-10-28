@@ -1,4 +1,6 @@
-News PhotoCard Pro 3.11.2 — Nexol BD
+News PhotoCard Pro 3.11.3 — Nexol BD
+
+- Handles malformed license-date errors safely across PHP/debugger environments.
 
 - Connects to https://nexolbd.com/api/v1/licenses/ using product code photocard-pro for monthly, yearly, and lifetime licenses.
 - Honors shorter server verification intervals, checks expiry independently, and rejects impossible expiry dates.

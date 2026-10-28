@@ -4,7 +4,7 @@ Tags: news, elementor, social media, template, design
 Requires at least: 5.8
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.11.2
+Stable tag: 3.11.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -105,7 +105,7 @@ The font, preview illustrations, and html2canvas are bundled locally. User-selec
 
 == Changelog ==
 
-= 3.11.2 =
+= 3.11.3 =
 * Honor shorter Nexol verification intervals and enforce subscription expiry independently of cached validity.
 * Preserve existing unexpired verification when activation is retried during a temporary service outage.
 * Reject impossible calendar dates in license responses.

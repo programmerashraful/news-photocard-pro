@@ -82,7 +82,7 @@ class UDNPC_License {
             $errors = DateTimeImmutable::getLastErrors();
             if ($errors !== false && ($errors['warning_count'] || $errors['error_count'])) return false;
             return $date->getTimestamp();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }
